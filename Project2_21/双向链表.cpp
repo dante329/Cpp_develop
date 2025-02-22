@@ -70,11 +70,23 @@ void insert_front(int p,int x)
 	pre[p] = id;
 }
  
-//删除任意位置的节点
+//删除任意位置的节点（头节点可以和中间节点合并，最后一个节点也可以合并，但是会改变头节点的pre） 
 void erase(int p)
 {
-	ne[pre[p]] = ne[p];
-	pre[ne[p]] = pre[p];
+	if (p == 0) //如果删除头节点 
+	{
+		return;
+	}
+	else if (ne[p] == 0) //删除最后一个节点 
+	{
+		ne[pre[p]] = ne[p];
+		mp[e[p]] = 0;
+	}
+	else //删除中间节点 
+	{
+		ne[pre[p]] = ne[p]; 
+		mp[e[p]] = 0;
+	}
  } 
  
 int main()
