@@ -94,7 +94,7 @@ int main()
 	
 	//µÚ¶şÎÊ
 	memset(f,-0x3f3f3f3f,sizeof f);
-	f[0][0] = 0; 
+	f[0] = 0; 
 	
 	for(int i=1;i<=n;i++)
 	{
