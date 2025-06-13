@@ -1,3 +1,4 @@
+//草稿 
 //#include<iostream>
 //#include<vector>
 //
@@ -108,6 +109,8 @@
 // } 
 // 	
 
+//这个思路是将主键和附件合并成一个物品，放入只有主件的数组中，对所有物品做一次01背包
+//这个思路就错在直接把多种组合加入数组，会出现这种错误状态 ：既选了「A + A1」，又选了「A + A2」实际上相当于用了两次主件 A，这是不允许的！
 #include<iostream>
 #include<vector>
 
@@ -184,4 +187,77 @@ int main()
 	return 0;
  } 
  
- 					
+//同上思路，代码进行了优化，能得到40分 
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+const int N = 70, M = 32010;
+
+int n, m; // n 是总金额，m 是物品个数
+int f[M];
+
+struct Item {
+    int v, w;
+};
+
+struct MainItem {
+    int v, w;
+    vector<Item> attachments;
+};
+
+MainItem mains[N];
+
+int main() {
+    cin >> n >> m;
+
+    int idx = 0;
+    for (int i = 1; i <= m; i++) {
+        int v, p, q;
+        cin >> v >> p >> q;
+        if (q == 0) {
+            mains[++idx].v = v;
+            mains[idx].w = v * p;
+        } else {
+            mains[q].attachments.push_back({v, v * p});
+        }
+    }
+
+    for (int i = 1; i <= idx; i++) {
+        // 遍历体积从大到小，做分组背包
+        for (int j = n; j >= 0; j--) {
+            // 只买主件
+            if (j >= mains[i].v)
+                f[j] = max(f[j], f[j - mains[i].v] + mains[i].w);
+
+            // 主件 + 附件1
+            if (mains[i].attachments.size() >= 1) {
+                int v1 = mains[i].attachments[0].v;
+                int w1 = mains[i].attachments[0].w;
+                if (j >= mains[i].v + v1)
+                    f[j] = max(f[j], f[j - mains[i].v - v1] + mains[i].w + w1);
+            }
+
+            // 主件 + 附件2
+            if (mains[i].attachments.size() >= 2) {
+                int v2 = mains[i].attachments[1].v;
+                int w2 = mains[i].attachments[1].w;
+                if (j >= mains[i].v + v2)
+                    f[j] = max(f[j], f[j - mains[i].v - v2] + mains[i].w + w2);
+            }
+
+            // 主件 + 附件1 + 附件2
+            if (mains[i].attachments.size() == 2) {
+                int v1 = mains[i].attachments[0].v, w1 = mains[i].attachments[0].w;
+                int v2 = mains[i].attachments[1].v, w2 = mains[i].attachments[1].w;
+                if (j >= mains[i].v + v1 + v2)
+                    f[j] = max(f[j], f[j - mains[i].v - v1 - v2] + mains[i].w + w1 + w2);
+            }
+        }
+    }
+
+    cout << f[n] << endl;
+    return 0;
+}
+					
